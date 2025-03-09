@@ -16,7 +16,7 @@ jobs:
           ref: gh-pages
       - name: Merge
         run: |
-          git pull main
+          git pull https://github.com/Unsandboxed/shaper.git
           git commit -m "merge main"
       - name: Download ScratchBlocks
         run: |
