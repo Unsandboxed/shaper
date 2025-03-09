@@ -29,10 +29,11 @@ jobs:
           git config --global user.name "yuri-kiss (shaper)"
       - name: Download ScratchBlocks
         run: |
-          rm -f blockly_compressed_vertical.js blocks_compressed_vertical.js blocks_compressed.js
+          rm -f blockly_compressed_vertical.js blocks_compressed_vertical.js blocks_compressed.js shpr-shim.js
           curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blockly_compressed_vertical.js -o blockly_compressed_vertical.js
           curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blocks_compressed_vertical.js -o blocks_compressed_vertical.js
           curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blocks_compressed.js -o blocks_compressed.js
+          curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop/core/shpr.js -o shpr-shim.js
       - name: Push
         run: |
           git add . -f
