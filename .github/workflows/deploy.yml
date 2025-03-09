@@ -16,7 +16,7 @@ jobs:
           ref: gh-pages
       - name: Merge
         run: |
-          git merge main
+          git pull main
           git commit -m "merge main"
       - name: Download ScratchBlocks
         run: |
