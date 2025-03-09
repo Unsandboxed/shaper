@@ -1,0 +1,31 @@
+name: Predeploy
+
+on:
+  push:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+      - name: Merge
+        run: |
+          git merge main
+          git commit -m "merge main"
+      - name: Download ScratchBlocks
+        run: |
+          rm -f blockly_compressed_vertical.js blocks_compressed_vertical.js blocks_compressed.js
+          curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blockly_compressed_vertical.js -o blockly_compressed_vertical.js
+          curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blocks_compressed_vertical.js -o blocks_compressed_vertical.js
+          curl --silent -L https://raw.githubusercontent.com/Unsandboxed/scratch-blocks/refs/heads/develop-builds/blocks_compressed.js -o blocks_compressed.js
+      - name: Push
+        run: |
+          git add .
+          git commit -m "scratch-blocks"
+          git push gh-pages
