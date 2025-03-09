@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shpr</title>
+  <style>
+    :root {
+      --usb-gray: rgb(102, 117, 127);
+      --nb-orange: rgb(255, 87, 38);
+      --tw-red: rgb(255, 76, 76);
+      --extension-green: rgb(13, 165, 122);
+      --scratch-blue: rgb(76, 151, 255);
+      --scratch-purple: rgb(133, 92, 214);
+      --miyo-pink: rgb(253, 135, 180);
+
+      --user-theme: var(--usb-gray);
+
+      --background-colour: #111111;
+      --background-colour-lighter: #282828;
+      --background-colour-darker: #090909;
+      --background-colour-darkerer: #070707;
+      --text-colour: #eeeeee;
+      --header-size: 3.125rem;
+      --header-colour: var(--user-theme);
+      --sep-colour: var(--header-colour);
+      --toolbar-size: calc(1rem + 4px);
+    }
+    * { padding: 0px; margin: 0px; box-sizing: border-box; }
+    body { height: 100%; }
+    html, body, main.body, div.wrapper {
+      width: 100%;
+      height: 100%;
+    }
+    body, main.body {
+      background: var(--background-colour);
+      color: var(--text-colour);
+      color-scheme: dark;
+      font-family: sans-serif;
+    }
+    main.body { height: calc(100% - var(--header-size)); }
+    div.header {
+      width: 100%;
+      height: var(--header-size);
+      background: var(--header-colour);
+      font-weight: bold;
+      font-size: calc(var(--header-size) - 1em);
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      padding: 5px;
+    }
+    div.header:not(.theme-picker) > span:first-child {
+      padding-right: 6px;
+      border-right: var(--text-colour) solid 2px;
+    }
+    div.header:not(.theme-picker) > button:first-of-type {
+      --colour: oklch(0.69 0.24 6.16);
+      background: conic-gradient(from 86deg in oklch longer hue, var(--colour), var(--colour));
+      width: 1.4rem;
+      height: 1.4rem;
+      border: 1px solid var(--text-colour);
+      border-radius: 100%;
+      cursor: pointer;
+    }
+    div.header:not(.theme-picker) a {
+      cursor: pointer;
+      text-decoration: none;
+      color: var(--text-colour);
+    }
+    div.header:not(.theme-picker) a:visited {
+      color: var(--text-colour);
+    }
+    div.header:not(.theme-picker) > *:not(:first-child) {
+      margin-left: 5px;
+      font-weight: 400;
+      font-size: medium;
+    }
+    div.editor, div.output {
+      width: 50%;
+      height: -webkit-fill-available;
+      display: inline-block;
+      resize: none;
+    }
+    div > div.container {
+      position: relative;
+      margin: 5px;
+      width: -webkit-fill-available;
+      height: -webkit-fill-available;
+    }
+    div.editor {
+      width: 50%;
+      resize: horizontal !important;
+      float: left;
+    }
+    div.section {
+      clip-path: content-box;
+      width: 100%;
+      padding-bottom: 2px;
+      min-height: var(--toolbar-size);
+    }
+    div.section > div.toolbar {
+      position: relative;
+      z-index: 1;
+      border-top: var(--sep-colour) solid 2px;
+      background: var(--background-colour-darker);
+      display: flex;
+      align-items: center;
+      justify-content: left;
+      height: var(--toolbar-size);
+      font-size: 0.8rem;
+      margin-top: 2px;
+      margin-bottom: 2px;
+    }
+    div.section > div.toolbar > img {
+      margin-left: 5px;
+      width: 0.8rem;
+      height: 0.8rem;
+      aspect-ratio: 1/1;
+      transition: transform 210ms;
+    }
+    div.section > div.toolbar[data-open="false"] > img {
+      transform: rotate(0deg);
+    }
+    div.section > div.toolbar[data-open="true"] > img {
+      transform: rotate(45deg);
+    }
+    div.section > div.toolbar > span {
+      margin-left: 2px;
+    }
+    div.section > div.content {
+      height: auto;
+      display: block;
+      overflow-x: auto;
+      overflow-y: hidden;
+    }
+    div.section > div.content > div.content-wrapper {
+      display: inherit;
+      min-height: fit-content;
+    }
+    div.section > div.content textarea {
+      resize: vertical;
+      width: 100%;
+      min-height: 60px;
+      height: 60px;
+    }
+    div.section > div.toolbar[data-open="false"] ~ div.content {
+      pointer-events: none;
+    }
+    div.section > div.toolbar[data-open="true"] ~ div.content {
+      border-bottom: var(--sep-colour) solid 2px;
+    }
+    blocks {
+      display: inline-block;
+      width: 100%;
+      min-height: 35%;
+      max-height: 35%;
+      height: 35%;
+    }
+    blocks > div.injectionDiv {
+      width: 100%;
+      height: 100%;
+    }
+
+    blocks .blocklySvg {
+      background-color: var(--background-colour-darker);
+    }
+
+    blocks .blocklyText {
+      fill: #ffffff;
+      font-family: "Helvetica Neue", Helvetica, sans-serif;
+      font-size: 12pt;
+      font-weight: 500;
+    }
+    blocks .blocklySvg .blocklyText {
+      user-select: none;
+      -moz-user-select: none;
+      -webkit-user-select: none;
+      cursor: inherit;
+    }
+
+    table.etbl {
+      width: 100%;
+      border-collapse: collapse;
+      border: 2px solid var(--sep-colour);
+      font-family: sans-serif;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+    table.etbl > caption {
+      width: 100%;
+      background-color: var(--background-colour-darker);
+      border: 2px solid var(--sep-colour);
+      border-bottom: none !important;
+      font-weight: bolder;
+      padding: 4px;
+    }
+    table.etbl > thead, table.etbl > tfoot {
+      background-color: var(--background-colour-darker);
+    }
+    table.etbl th, table.etbl td {
+      font-size: small;
+      font-weight: 200;
+      border: 1px solid var(--sep-colour);
+      padding: 4px;
+    }
+    table.etbl tbody td:last-of-type {
+      text-align: center;
+    }
+    table.etbl > tbody > tr > th:nth-child(1) > img,
+    table.etbl > tfoot > tr > th:nth-child(1) > img {
+      width: 1em;
+      height: auto;
+      aspect-ratio: 1/1;
+      cursor: pointer;
+    }
+    table.etbl > tbody > tr > th:nth-child(1)[disabled] > img {
+      cursor: not-allowed !important;
+    }
+    table.etbl > tbody > tr:nth-of-type(even),
+    table.etbl > tfoot > tr:nth-of-type(even) {
+      background-color: var(--background-colour-darkerer);
+    }
+
+    dialog.theme-picker {
+      margin: auto;
+      border: var(--sep-colour) 4px solid;
+    }
+    dialog.theme-picker > div.themes {
+      display: flex;
+      flex-direction: column-reverse;
+      padding: 0.315rem;
+      padding-top: 0px;
+      align-items: center;
+      --svg-size: 16pt;
+    }
+    div.themes > div {
+      margin-top: 0.315rem;
+      display: block;
+      padding: 2px;
+      align-items: center;
+      justify-content: center;
+      width: -webkit-fill-available;
+    }
+    div.themes > div:hover {
+      background-color: var(--background-colour-lighter);
+      cursor: pointer;
+    }
+    div.themes > div > svg {
+      width: var(--svg-size);
+      height: var(--svg-size);
+      aspect-ratio: 1/1;
+      margin-right: 8px;
+    }
+    div.themes > div > span {
+      position: absolute;
+      transform: translateY(calc(calc(var(--svg-size) / 2) - 7pt));
+    }
+  </style>
+  <script>globalThis.Retheme = Array.from(JSON.parse(localStorage['retheme'] || '[]')).concat(
+    'usb-gray', 'nb-orange', 'tw-red', 'extension-green', 'scratch-blue', 'scratch-purple'
+  );Retheme.ACTIVE = localStorage['retheme-theme'] || 'usb-gray';if(Retheme.includes(Retheme.ACTIVE)){
+  document.querySelector(':root').style.setProperty(
+    '--user-theme', `var(--${Retheme.ACTIVE})`
+  );}</script>
+</head>
+<body>
+  <noscript>This page requires JavaScript.</noscript>
+  <script defer>document.body.appendChild(document.createTextNode('Loading'))</script>
+  <script src="blockly_compressed_vertical.js" defer></script>
+  <script src="blocks_compressed.js" defer></script>
+  <script src="blocks_compressed_vertical.js" defer></script>
+  <script src="shpr-shim.js" defer></script>
+  <script src="shpr-ovwr.js" defer></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+  <script src="gui.js" defer></script>
+</body>
+</html>
